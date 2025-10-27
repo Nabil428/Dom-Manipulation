@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOM Manipulation Mastery</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f7f9fb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #222;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 8px;
+      background: #333;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    #container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    .card {
+      width: 150px;
+      height: 150px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: black;
+      position: relative;
+      transition: 0.3s;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="main-title">🎨 DOM Manipulation</h1>
+
+  <div class="controls">
+    <button id="add">Add Card</button>
+    <button id="change">Change All Colors</button>
+    <button id="rename">Rename Cards</button>
+    <button id="removeAll">Remove All</button>
+  </div>
+
+  <div id="container"></div>
+
+  <script>
+    // -----------------------------
+    // 🔹 Selecting elements
+    // -----------------------------
+    const container = document.querySelector("#container");   // Select container by ID
+    const addBtn = document.querySelector("#add");             // Select add button
+    const changeBtn = document.querySelector("#change");       // Select change color button
+    const renameBtn = document.querySelector("#rename");       // Select rename button
+    const removeAllBtn = document.getElementById("removeAll"); // getElementById still works
+
+    // -----------------------------
+    // 🔹 Utility: Random color generator
+    // -----------------------------
+    function randomColor() {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // -----------------------------
+    // 🔹 Function: Create new card
+    // -----------------------------
+    function createCard() {
+      const card = document.createElement("div");       // createElement()
+      card.classList.add("card");                       // add CSS class
+      card.style.backgroundColor = randomColor();       // style property
+      card.setAttribute("data-id", Date.now());         // setAttribute()
+      const count = container.children.length + 1;
+      card.textContent = "Card " + count;               // add text content
+
+      // Add delete button inside each card
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "✕";
+      delBtn.classList.add("delete-btn");
+      card.appendChild(delBtn);                         // appendChild()
+
+      // Delete a single card
+      delBtn.addEventListener("click", (e) => {
+        e.stopPropagation();                            // prevent parent click
+        card.remove();                                  // remove element
+      });
+
+      // Change color on click
+      card.addEventListener("click", () => {
+        card.style.backgroundColor = randomColor();     // change style
+      });
+
+      // Add tooltip using setAttribute
+      card.setAttribute("title", "Click to change color or delete ✕");
+
+      container.appendChild(card);                      // finally add card to container
+    }
+
+    // -----------------------------
+    // 🔹 Add new card (event)
+    // -----------------------------
+    addBtn.addEventListener("click", () => {
+      createCard();                                     // call function
+    });
+
+    // -----------------------------
+    // 🔹 Change all card colors
+    // -----------------------------
+    changeBtn.addEventListener("click", () => {
+      const cards = document.querySelectorAll(".card"); // querySelectorAll()
+      cards.forEach((card, index) => {
+        card.style.backgroundColor = randomColor();     // change multiple styles
+        card.textContent = "Recolored " + (index + 1);  // modify textContent
+        card.style.transform = "rotate(3deg)";
+        setTimeout(() => (card.style.transform = "rotate(0)"), 200);
+      });
+    });
+
+    // -----------------------------
+    // 🔹 Rename all cards
+    // -----------------------------
+    renameBtn.addEventListener("click", () => {
+      const cards = document.querySelectorAll(".card");
+      cards.forEach((card, i) => {
+        card.innerHTML = `🌈 Renamed <b>#${i + 1}</b> 
+                          <button class='delete-btn'>✕</button>`;  // using innerHTML
+        const del = card.querySelector(".delete-btn");  // nested querySelector
+        del.addEventListener("click", (e) => {
+          e.stopPropagation();
+          card.remove();
+        });
+      });
+    });
+
+    // -----------------------------
+    // 🔹 Remove all cards
+    // -----------------------------
+    removeAllBtn.addEventListener("click", () => {
+      container.innerHTML = "";                         // clear all inner HTML
+      document.querySelector("#main-title").textContent = "🎨 All Cards Removed!"; // update text
+      document.querySelector("#main-title").style.color = "red"; // change style
+      document.querySelector("#main-title").classList.toggle("blink"); // toggle class for fun
+    });
+
+  </script>
+</body>
+</html>
